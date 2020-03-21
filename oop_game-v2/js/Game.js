@@ -19,6 +19,12 @@
         //to guess
         this.activePhrase = null;
         
+
+        //two helper properties to track which letters are chosen and correct and 
+        //incorrect
+        this.matchedLetters = new Set(); 
+        this.missedLetters = new Set();
+        
     }
     //helper getter to get the number of the un-guessed(hidden)
     //letters from the phrase
@@ -50,19 +56,27 @@
         if(isKeyboard && !(/^[a-z]{1}$/i.test(key)))
             return;
         
-        if(this.activePhrase.checkLetter(key)){//check if the letter is in the phrase
+        if(this.activePhrase.checkLetter(key) ){//check if the letter is in the phrase
             this.activePhrase.showMatchedLetter(key);//show the matched letter on screen
             //if the input was from the onscreen keyboard disable it and add a class for styling
             if(!isKeyboard)
                 $(event.target).attr('disabled',true).toggleClass('chosen');
+            
+            //if the input was from the keyboard check if the letter was not matched previously
+            //and add the chosen class
+            else if (!this.matchedLetters.has(key)) $(`.key:contains(${key})`).attr('disabled',true).toggleClass('chosen');
             //check if the user won the game
             this.checkForWin();
-        }else{
+
+            //add the matched letter to the matched set
+            this.matchedLetters.add(key);
+        }else if(!this.missedLetters.has(key)){
             //if the input was from the onscreen keyboard disable it and add a class for styling
             if(!isKeyboard)
-                $(event.target).addClass('wrong');
+                $(event.target).addClass('wrong').attr('disabled',true);
+            else $(`.key:contains(${key})`).attr('disabled',true).toggleClass('wrong');
             this.missed++;//increment the count of missed attempts
-            
+            this.missedLetters.add(key);//add the missed letter to the missed set
             if(this.missed == 5) //if the missed count is 5 the user lost so end game
                 this.gameOver('lost');
             else
