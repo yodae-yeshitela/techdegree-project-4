@@ -44,7 +44,7 @@ class Game{
        $(window).on( 'keyup' , this.handleInteraction.bind(this));
    }
    getRandomPhrase(){
-       let index = Math.floor(Math.random()*5);
+       let index = Math.floor(Math.random()* this.phrases.length);
        return this.phrases[index];
    }
    handleInteraction(event){
@@ -74,25 +74,25 @@ class Game{
            //if the input was from the onscreen keyboard disable it and add a class for styling
            if(!isKeyboard)
                $(event.target).addClass('wrong').attr('disabled',true);
-           else $(`.key:contains(${key})`).attr('disabled',true).toggleClass('wrong');
-           this.missed++;//increment the count of missed attempts
-           this.missedLetters.add(key);//add the missed letter to the missed set
-           if(this.missed == 5) //if the missed count is 5 the user lost so end game
-               this.gameOver('lost');
-           else
-               this.removeLife();//otherwise update the lives the user has
+           else 
+                $(`.key:contains(${key})`).attr('disabled',true).toggleClass('wrong');
+           this.removeLife(key);
        }
-
    }
+   removeLife(key){
 
-
-   removeLife(){
-      //replace the image to update the lives count
-      $('#scoreboard li.tries').last().toggleClass('tries').children('img').attr('src', 'images/lostHeart.png');
-   }
+    this.missed++;//increment the count of missed attempts
+    this.missedLetters.add(key);//add the missed letter to the missed set
+    //replace the image to update the lives count
+    $('#scoreboard li.tries').last().toggleClass('tries').children('img').attr('src', 'images/lostHeart.png');
+    
+    //if the missed count is 5 the user lost so end game
+    this.missed === 5 ? this.gameOver('lost'):null;
+    
+    }   
 
    checkForWin(){
-       //if the user found all words end the game with a win
+       //if the user found all words return true
        return this.notAnswered === 0;
    }
 
@@ -100,11 +100,9 @@ class Game{
        //remove the keyboard event listener after game is over
        $(window).off('keyup');
        
-       //reset game variables and displays
-       this.missed = 0;
-       $('#phrase ul').children().remove();
-       $('#qwerty button').removeClass('chosen wrong').attr('disabled', false);
-       $('#scoreboard li').addClass('tries').children().attr('src','images/liveHeart.png');
+        $('#phrase ul').children().remove();
+        $('#qwerty button').removeClass('chosen wrong').attr('disabled', false);
+        $('#scoreboard li').addClass('tries').children().attr('src','images/liveHeart.png');
        
        //if the user won display the overlay screen with a win message
        if(outcome ==='win'){

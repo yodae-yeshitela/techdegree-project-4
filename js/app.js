@@ -3,13 +3,16 @@
  * app.js */
 
 //create an instance of the game class
-const game = new Game();
+let game;
 
 //add event listener to the start game button when
 //to start the game when clicked
-const gameStart = $('#btn__reset').click(() => game.startGame());
+$('#btn__reset').click(
+    () => {
+        game = new Game();
+        game.startGame();
+        //add event listener to all letter keys on the screen
+        $('#qwerty button').on('click', (event)=> game.handleInteraction(event));
+    });
 
-//add event listener to all letter keys on the screen 
-const $keys = $('#qwerty button').on('click', game.handleInteraction.bind(game));
-
- 
+    
